@@ -61,9 +61,10 @@ public abstract class AbstractTransport : Transport {
 
     // to not skip messages
     private val _onMessageInitialized = CompletableDeferred<Unit>()
+    private var _onMessageHandler: suspend (JSONRPCMessage) -> Unit = { _ -> }
     protected var _onMessage: (suspend ((JSONRPCMessage) -> Unit)) = {
         _onMessageInitialized.await()
-        _onMessage.invoke(it)
+        _onMessageHandler.invoke(it)
     }
         private set
 
@@ -85,11 +86,11 @@ public abstract class AbstractTransport : Transport {
 
     override fun onMessage(block: suspend (JSONRPCMessage) -> Unit) {
         val old: suspend (JSONRPCMessage) -> Unit = when (_onMessageInitialized.isCompleted) {
-            true -> _onMessage
+            true -> _onMessageHandler
             false -> { _ -> }
         }
 
-        _onMessage = { message ->
+        _onMessageHandler = { message ->
             old(message)
             block(message)
         }

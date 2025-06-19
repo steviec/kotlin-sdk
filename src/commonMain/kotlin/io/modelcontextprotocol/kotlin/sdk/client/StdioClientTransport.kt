@@ -21,8 +21,8 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
 import kotlinx.io.writeString
-import kotlin.concurrent.atomics.AtomicBoolean
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlinx.atomicfu.AtomicBoolean
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -34,7 +34,6 @@ import kotlin.coroutines.CoroutineContext
  * @param input The input stream where messages are received.
  * @param output The output stream where messages are sent.
  */
-@OptIn(ExperimentalAtomicApi::class)
 public class StdioClientTransport(
     private val input: Source,
     private val output: Sink
@@ -45,12 +44,12 @@ public class StdioClientTransport(
         CoroutineScope(ioCoroutineContext + SupervisorJob())
     }
     private var job: Job? = null
-    private val initialized: AtomicBoolean = AtomicBoolean(false)
+    private val initialized: AtomicBoolean = atomic(false)
     private val sendChannel = Channel<JSONRPCMessage>(Channel.UNLIMITED)
     private val readBuffer = ReadBuffer()
 
     override suspend fun start() {
-        if (!initialized.compareAndSet(expectedValue = false, newValue = true)) {
+        if (!initialized.compareAndSet(expect = false, update = true)) {
             error("StdioClientTransport already started!")
         }
 
@@ -104,7 +103,7 @@ public class StdioClientTransport(
     }
 
     override suspend fun send(message: JSONRPCMessage) {
-        if (!initialized.load()) {
+        if (!initialized.value) {
             error("Transport not started")
         }
 
@@ -112,7 +111,7 @@ public class StdioClientTransport(
     }
 
     override suspend fun close() {
-        if (!initialized.compareAndSet(expectedValue = true, newValue = false)) {
+        if (!initialized.compareAndSet(expect = true, update = false)) {
             error("Transport is already closed")
         }
         job?.cancelAndJoin()

@@ -25,7 +25,6 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -51,7 +50,6 @@ public val McpJson: Json by lazy {
         ignoreUnknownKeys = true
         encodeDefaults = true
         isLenient = true
-        classDiscriminatorMode = ClassDiscriminatorMode.NONE
         explicitNulls = false
     }
 }

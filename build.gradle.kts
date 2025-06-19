@@ -20,10 +20,10 @@ plugins {
 }
 
 group = "io.modelcontextprotocol"
-version = "0.5.0"
+version = "0.5.0-maestro1"
 
 val mainSourcesJar = tasks.register<Jar>("mainSourcesJar") {
-    archiveClassifier = "sources"
+    archiveClassifier.set("sources")
     from(kotlin.sourceSets.getByName("commonMain").kotlin)
 }
 
@@ -44,7 +44,7 @@ publishing {
 }
 
 jreleaser {
-    gitRootSearch = true
+    gitRootSearch.set(true)
     strict.set(true)
 
     signing {
@@ -61,19 +61,19 @@ jreleaser {
                 val ossrh by creating {
                     active.set(Active.ALWAYS)
                     url.set("https://central.sonatype.com/api/v1/publisher")
-                    applyMavenCentralRules = false
-                    maxRetries = 240
+                    applyMavenCentralRules.set(false)
+                    maxRetries.set(240)
                     stagingRepository(layout.buildDirectory.dir("staging-deploy").get().asFile.path)
                     // workaround: https://github.com/jreleaser/jreleaser/issues/1784
                     kotlin.targets.forEach { target ->
                         if (target !is KotlinJvmTarget && target !is KotlinAndroidTarget && target !is KotlinMetadataTarget) {
-                            val klibArtifactId = "${name}-${target.name.lowercase()}"
+                            val klibArtifactId = "${name}-${target.name.toLowerCase()}"
                             artifactOverride {
-                                artifactId = klibArtifactId
-                                jar = false
-                                verifyPom = false
-                                sourceJar = false
-                                javadocJar = false
+                                artifactId.set(klibArtifactId)
+                                jar.set(false)
+                                verifyPom.set(false)
+                                sourceJar.set(false)
+                                javadocJar.set(false)
                             }
                         }
                     }
@@ -84,10 +84,10 @@ jreleaser {
 
     release {
         github {
-            skipRelease = true
-            skipTag = true
-            overwrite = false
-            token = "none"
+            skipRelease.set(true)
+            skipTag.set(true)
+            overwrite.set(false)
+            token.set("none")
         }
     }
 }
@@ -227,6 +227,7 @@ kotlin {
                 api(libs.ktor.server.cio)
                 implementation(libs.kotlin.logging)
                 implementation(libs.kotlinx.io)
+                implementation(libs.kotlinx.atomicfu)
             }
         }
 

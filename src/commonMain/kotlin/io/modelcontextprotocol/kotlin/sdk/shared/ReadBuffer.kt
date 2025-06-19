@@ -1,7 +1,8 @@
 package io.modelcontextprotocol.kotlin.sdk.shared
 
-import io.ktor.utils.io.core.writeFully
+import kotlinx.io.write
 import io.modelcontextprotocol.kotlin.sdk.JSONRPCMessage
+import io.modelcontextprotocol.kotlin.sdk.JSONRPCMessagePolymorphicSerializer
 import kotlinx.io.Buffer
 import kotlinx.io.indexOf
 import kotlinx.io.readString
@@ -14,7 +15,7 @@ public class ReadBuffer {
     private val buffer: Buffer = Buffer()
 
     public fun append(chunk: ByteArray) {
-        buffer.writeFully(chunk)
+        buffer.write(chunk)
     }
 
     public fun readMessage(): JSONRPCMessage? {
@@ -47,7 +48,7 @@ public class ReadBuffer {
 }
 
 internal fun deserializeMessage(line: String): JSONRPCMessage {
-    return McpJson.decodeFromString<JSONRPCMessage>(line)
+    return McpJson.decodeFromString(JSONRPCMessagePolymorphicSerializer, line)
 }
 
 internal fun serializeMessage(message: JSONRPCMessage): String {

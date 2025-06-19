@@ -20,26 +20,28 @@ jreleaser = "1.17.0"
 binaryCompatibilityValidatorPlugin = "0.13.2"
 slf4j = "[2.0.0,)"         # Any version >= 2.0.0
 kotest = "[5.9.0,)"        # Any version >= 5.9.0
-kotlinx-io = "[0.1.16,)"   # Any version >= 0.1.16 for Kotlin 1.8.22
+kotlinx-io = "0.2.0"      # Earliest available version compatible with Kotlin 1.8.22
+kotlinx-atomicfu = "0.20.2"  # Atomic operations for Kotlin 1.8.22
 
 [libraries]
-# Kotlinx libraries
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
-kotlinx-io = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", version.ref = "kotlinx-io" }
+# Kotlinx libraries - using exact versions compatible with Kotlin 1.8.22
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.0" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.7.0" }
+kotlinx-io = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", version = "0.2.0" }
+kotlinx-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version = "0.20.2" }
 
 # Ktor libraries
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
 ktor-server-cio = { group = "io.ktor", name = "ktor-server-cio", version.ref = "ktor" }
 
-# Logging
-kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging", version.ref = "logging" }
-slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
+# Logging - using exact versions compatible with Kotlin 1.8.22
+kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging", version = "7.0.0" }
+slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version = "2.0.0" }
 
-# Testing
-mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
-kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
-kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+# Testing - using exact versions compatible with Kotlin 1.8.22
+mockk = { group = "io.mockk", name = "mockk", version = "1.12.0" }
+kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", version = "5.9.0" }
+kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version = "5.9.0" }
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

@@ -21,8 +21,8 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
 import kotlinx.io.writeString
-import kotlin.concurrent.atomics.AtomicBoolean
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlinx.atomicfu.AtomicBoolean
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -30,7 +30,6 @@ import kotlin.coroutines.CoroutineContext
  *
  * Reads from System.in and writes to System.out.
  */
-@OptIn(ExperimentalAtomicApi::class)
 public class StdioServerTransport(
     private val inputStream: Source,
     outputStream: Sink
@@ -38,7 +37,7 @@ public class StdioServerTransport(
     private val logger = KotlinLogging.logger {}
 
     private val readBuffer = ReadBuffer()
-    private val initialized: AtomicBoolean = AtomicBoolean(false)
+    private val initialized: AtomicBoolean = atomic(false)
     private var readingJob: Job? = null
     private var sendingJob: Job? = null
 
@@ -49,7 +48,7 @@ public class StdioServerTransport(
     private val outputWriter = outputStream.buffered()
 
     override suspend fun start() {
-        if (!initialized.compareAndSet(expectedValue = false, newValue = true)) {
+        if (!initialized.compareAndSet(expect = false, update = true)) {
             error("StdioServerTransport already started!")
         }
 
@@ -124,7 +123,7 @@ public class StdioServerTransport(
     }
 
     override suspend fun close() {
-        if (!initialized.compareAndSet(expectedValue = true, newValue = false)) return
+        if (!initialized.compareAndSet(expect = true, update = false)) return
 
         withContext(NonCancellable) {
             writeChannel.close()

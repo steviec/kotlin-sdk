@@ -33,7 +33,7 @@ internal object ErrorCodeSerializer : KSerializer<ErrorCode> {
 
     override fun deserialize(decoder: Decoder): ErrorCode {
         val decodedInt = decoder.decodeInt()
-        return ErrorCode.Defined.entries.firstOrNull { it.code == decodedInt }
+        return ErrorCode.Defined.values().firstOrNull { it.code == decodedInt }
             ?: ErrorCode.Unknown(decodedInt)
     }
 }
@@ -48,7 +48,7 @@ internal object RequestMethodSerializer : KSerializer<Method> {
 
     override fun deserialize(decoder: Decoder): Method {
         val decodedString = decoder.decodeString()
-        return Method.Defined.entries.firstOrNull { it.value == decodedString }
+        return Method.Defined.values().firstOrNull { it.value == decodedString }
             ?: Method.Custom(decodedString)
     }
 }
@@ -64,9 +64,9 @@ internal object StopReasonSerializer : KSerializer<StopReason> {
     override fun deserialize(decoder: Decoder): StopReason {
         val decodedString = decoder.decodeString()
         return when (decodedString) {
-            StopReason.StopSequence.value -> StopReason.StopSequence
-            StopReason.MaxTokens.value -> StopReason.MaxTokens
-            StopReason.EndTurn.value -> StopReason.EndTurn
+            "stopSequence" -> StopReason.StopSequence()
+            "maxTokens" -> StopReason.MaxTokens()
+            "endTurn" -> StopReason.EndTurn()
             else -> StopReason.Other(decodedString)
         }
     }
