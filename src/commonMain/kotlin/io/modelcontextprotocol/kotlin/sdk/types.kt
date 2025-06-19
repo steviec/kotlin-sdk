@@ -1293,19 +1293,13 @@ public sealed interface StopReason {
     public val value: String
 
     @Serializable
-    public data object EndTurn : StopReason {
-        override val value: String = "endTurn"
-    }
+    public data class EndTurn(override val value: String = "endTurn") : StopReason
 
     @Serializable
-    public data object StopSequence : StopReason {
-        override val value: String = "stopSequence"
-    }
+    public data class StopSequence(override val value: String = "stopSequence") : StopReason
 
     @Serializable
-    public data object MaxTokens : StopReason {
-        override val value: String = "maxTokens"
-    }
+    public data class MaxTokens(override val value: String = "maxTokens") : StopReason
 
     @Serializable
     @JvmInline

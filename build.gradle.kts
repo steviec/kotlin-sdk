@@ -1,8 +1,7 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
 import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -68,11 +67,7 @@ jreleaser {
                     // workaround: https://github.com/jreleaser/jreleaser/issues/1784
                     kotlin.targets.forEach { target ->
                         if (target !is KotlinJvmTarget && target !is KotlinAndroidTarget && target !is KotlinMetadataTarget) {
-                            val klibArtifactId = if (target.platformType == KotlinPlatformType.wasm) {
-                                "${name}-wasm-${target.name.lowercase().substringAfter("wasm")}"
-                            } else {
-                                "${name}-${target.name.lowercase()}"
-                            }
+                            val klibArtifactId = "${name}-${target.name.lowercase()}"
                             artifactOverride {
                                 artifactId = klibArtifactId
                                 jar = false
@@ -127,12 +122,12 @@ fun MavenPom.configureMavenCentralMetadata() {
 }
 
 fun configureEmptyJavadocArtifact(): org.gradle.jvm.tasks.Jar {
-    val javadocJar by project.tasks.creating(Jar::class) {
+    val javadocJar by project.tasks.registering(Jar::class) {
         archiveClassifier.set("javadoc")
         // contents are deliberately left empty
         // https://central.sonatype.org/publish/requirements/#supply-javadoc-and-sources
     }
-    return javadocJar
+    return javadocJar.get()
 }
 
 fun MavenPublication.signPublicationIfKeyPresent() {
@@ -214,59 +209,37 @@ val generateLibVersionTask =
 
 kotlin {
     jvm {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_1_8
+        jvmToolchain(17)
+        withJava()
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
         }
-    }
-
-    iosArm64()
-    iosX64()
-    iosSimulatorArm64()
-
-    js(IR) {
-        nodejs {
-            testTask {
-                useMocha {
-                    timeout = "30s"
-                }
-            }
-        }
-    }
-
-    wasmJs {
-        nodejs()
     }
 
     explicitApi = ExplicitApiMode.Strict
 
-    jvmToolchain(21)
-
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             kotlin.srcDir(generateLibVersionTask.map { it.sourcesDir })
             dependencies {
                 api(libs.kotlinx.serialization.json)
                 api(libs.ktor.client.cio)
                 api(libs.ktor.server.cio)
-                api(libs.ktor.server.sse)
-                api(libs.ktor.server.websockets)
-
                 implementation(libs.kotlin.logging)
+                implementation(libs.kotlinx.io)
             }
         }
 
-        commonTest {
+        val commonTest by getting {
             dependencies {
-                implementation(libs.kotlin.test)
-                implementation(libs.ktor.server.test.host)
-                implementation(libs.kotlinx.coroutines.test)
-                implementation(libs.kotest.assertions.json)
-            }
-        }
-
-        jvmTest {
-            dependencies {
+                implementation(libs.kotest.runner.junit5)
+                implementation(libs.kotest.assertions.core)
                 implementation(libs.mockk)
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {
                 implementation(libs.slf4j.simple)
             }
         }

@@ -1,8 +1,3 @@
-@file:OptIn(ExperimentalWasmDsl::class, ExperimentalKotlinGradlePluginApi::class)
-
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-
 plugins {
     kotlin("multiplatform") version "2.1.20"
     kotlin("plugin.serialization") version "2.1.20"
@@ -36,10 +31,6 @@ kotlin {
             }
         }
     }
-    wasmJs {
-        nodejs()
-        binaries.executable()
-    }
 
     sourceSets {
         commonMain.dependencies {
@@ -48,6 +39,5 @@ kotlin {
         jvmMain.dependencies {
             implementation("org.slf4j:slf4j-nop:2.0.9")
         }
-        wasmJsMain.dependencies {}
     }
 }
