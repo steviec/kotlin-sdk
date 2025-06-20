@@ -209,8 +209,13 @@ val generateLibVersionTask =
 
 kotlin {
     jvm {
-        jvmToolchain(17)
+        jvmToolchain(11)
         withJava()
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }
